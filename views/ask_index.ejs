@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Ask question finder</title>
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" type="text/css">
+	</head>
+  <body role="document">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <span class="navbar-brand" href="#">Ask question finder</span>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+          	<li><a href="http://ask.fm/richie3366" target="_blank">Ask de Richie</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div class="container" style="padding-top: 20px;" role="main">
+      <div class="page-header">
+      	<div class="panel" style="border-bottom: 0px; box-shadow: none;">
+	    	<h3>Recherche de questions ask <span id="nb_res"></span></h3>
+	    	<input id="search_input" type="text" style="width: 350px;" />
+	    	<button type="button" onclick="$('#help').toggle()" class="btn btn-xs btn-primary">?</button>
+		    <div id="help" class="alert alert-info" style="margin-top: 10px;padding-top: 5px;display: none;">
+		    	<span style="font-size: 20px;">Astuces :</span><br>
+		    	<ul>
+		    		<li>La recherche est en regex</li>
+		    		<li>Le point (.) équivaut à n'importe quel caractère (idéal pour les accents)</li>
+		    		<li>Un caractère précédé d'un "?" est facultatif, ainsi "saisons?" trouvera ce qui contient "saison" ou "saisons"</li>
+		    		<li>N'hésitez pas à utiliser " AND " et " OR " pour faire des recherches plus intelligentes</li>
+		    		<li>"bonne (nuit|journée)" trouvera ce qui contient "bonne nuit" ou "bonne journée"</li>
+		    		<li>Le point-virgule sert à obliger la délimitation autour d'un [groupe de] mot[s]</li>
+		    	</ul>
+		    </div>
+	    </div>
+
+	    <div id="results">
+
+	    </div>
+	    <div id="result_ref" style="display: none;">
+			<div class="panel panel-info ask-box" data-ask-id="" style="cursor: pointer;" onclick="window.open('http://ask.fm/richie3366/answer/'+$(this).attr('data-ask-id'), '_blank'); return false;">
+	            <div class="panel-heading">
+	              <h3 class="panel-title">Panel title</h3>
+	            </div>
+	            <div class="panel-body">
+	              Panel content
+	            </div>
+	        </div>
+        </div>
+    </div> <!-- /container -->
+    <div style="text-align: center; font-style: italic;" class="container" >
+    	Les questions sont récupérées toutes les 30 minutes pour être archivées sur cette page.
+    </div>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+    var prevSearch, lastChange;
+    $(function(){
+    	
+    	$('#search_input').on('keyup paste change', function(){
+    		var s = $('#search_input').val();
+    		lastChange = s;
+
+    		if(s.length > 0 && s !== prevSearch){
+    			(function(s){
+    				$.ajax({
+	    			url: "/search?q="+encodeURIComponent(s),
+	    			success: function(content){
+	    				if(s == lastChange){
+	    					//console.log('res', content);
+	    					prevSearch = s;
+	    					var nbRes = content.results.length;
+	    					
+	    					$('#results').html('');
+	    					$('#nb_res').html('('+(nbRes>0?nbRes:'aucun')+" résultat"+(nbRes>1?'s':'')+')');
+
+	    					for(var _i in content.results){
+	    						var curr = content.results[_i];
+	    						var elem = $( $('#result_ref').html() );
+
+	    						['question', 'answer'].forEach(function(prop, prop_i){
+	    							content.regex.forEach(function(pattern, pattern_i){
+	    								var reg = RegExp('('+pattern+')', 'ig');
+	    								var str = curr[prop]+"";
+	    								var m   = str.match(reg);
+	    								if(m && m.length < 10)
+		    								curr[prop] = curr[prop].replace(reg, '<span style="background-color: yellow;">$1</span>');
+	    							});
+	    						});
+
+	    						elem.attr('data-ask-id', curr.askid);
+	    						elem.find(".panel-title").html(curr.question.replace('\n', '<br>'));
+	    						elem.find(".panel-body" ).html(curr.answer.replace(  '\n', '<br>'));
+
+	    						$('#results').append(elem);
+	    					}
+	    				}
+	    			},
+	    			error: function(err){
+	    				console.error("Error : ", err);
+	    			}
+	    			});
+    			})(s);
+	    		
+	    	}
+    	});
+
+    	$('#search_input').focus();
+    });
+    </script>
+  </body>
+</html>
