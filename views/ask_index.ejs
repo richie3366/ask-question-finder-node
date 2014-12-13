@@ -98,8 +98,8 @@
 	    						});
 
 	    						elem.attr('data-ask-id', curr.askid);
-	    						elem.find(".panel-title").html(curr.question.replace('\n', '<br>'));
-	    						elem.find(".panel-body" ).html(curr.answer.replace(  '\n', '<br>'));
+	    						elem.find(".panel-title").html(curr.question.replace(/\n/g, '<br>'));
+	    						elem.find(".panel-body" ).html(curr.answer.replace(  /\n/g, '<br>'));
 
 	    						$('#results').append(elem);
 	    					}
