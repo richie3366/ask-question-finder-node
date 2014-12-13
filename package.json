@@ -1,6 +1,6 @@
 {
   "name": "ask-question-finder-node",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A node app to store and easily find ask questions/answers",
   "keywords": [
     "ask"

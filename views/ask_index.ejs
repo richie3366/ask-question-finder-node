@@ -33,7 +33,7 @@
 		    	<span style="font-size: 20px;">Astuces :</span><br>
 		    	<ul>
 		    		<li>La recherche est en regex</li>
-		    		<li>Le point (.) équivaut à n'importe quel caractère (idéal pour les accents)</li>
+		    		<li>Le point (.) équivaut à n'importe quel caractère (comme le carré blanc au Scrabble :p)</li>
 		    		<li>Un caractère précédé d'un "?" est facultatif, ainsi "saisons?" trouvera ce qui contient "saison" ou "saisons"</li>
 		    		<li>N'hésitez pas à utiliser " AND " et " OR " pour faire des recherches plus intelligentes</li>
 		    		<li>"bonne (nuit|journée)" trouvera ce qui contient "bonne nuit" ou "bonne journée"</li>
@@ -64,13 +64,25 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-    var prevSearch, lastChange;
+    var prevSearch, lastChange, replacerQueue = [];
 
     function genAccentsReplacer(curr, prop){
     	return function(){
     		var match = arguments[0], p1 = arguments[1], offset = arguments[arguments.length-2], str = arguments[arguments.length-1];
-    		return '<span style="background-color: yellow;">'+curr[prop].substr(offset, p1.length)+'</span>';
+    		var toRet = '<span style="background-color: yellow;">'+curr[prop].substr(offset, p1.length)+'</span>';
+    		replacerQueue.push({o: offset, l:p1.length, str:toRet});
+    		return toRet;
     	};
+    }
+
+    function processReplacerQueue(str, curr, prop){
+    	var offsetDiff = 0;
+    	for(_i in replacerQueue){
+    		curr[prop] = curr[prop].substr(0, replacerQueue[_i].o+offsetDiff) + replacerQueue[_i].str + curr[prop].substr(replacerQueue[_i].o + replacerQueue[_i].l + offsetDiff);
+    		offsetDiff+= replacerQueue[_i].str.length - replacerQueue[_i].l;
+    	}
+    	replacerQueue.splice(0, replacerQueue.length);
+    	return curr[prop];
     }
 
     $(function(){
@@ -102,7 +114,7 @@
 	    								var str = curr[prop]+"";
 	    								var m   = str.match(reg);
 	    								if(m === null || m.length < 10)
-		    								curr[prop] = curr[prop+'strip'].replace(reg, genAccentsReplacer(curr, prop));
+		    								curr[prop] = processReplacerQueue(curr[prop+'strip'].replace(reg, genAccentsReplacer(curr, prop)), curr, prop);
 	    							});
 	    						});
 
