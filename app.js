@@ -47,6 +47,13 @@ app.get('/search', function (req, res) {
 
 		for(var _i in spl){
 			var curr;
+			var searchSpec = false;
+
+			if((spl[_i].toLowerCase().indexOf('$q:') === 0 || spl[_i].toLowerCase().indexOf('$a:') === 0) && spl[_i].length > 3){
+				searchSpec = ((spl[_i].toLowerCase().substr(0, 3) === '$q:')?'question':'answer');
+				spl[_i] = spl[_i].substr(3);
+			}
+
 			try{
 				curr = RegExp(spl[_i].trim().replace(';', '\\W'), 'ig');
 				req.query._regex.push(spl[_i].trim().replace(';', ''));
@@ -54,7 +61,14 @@ app.get('/search', function (req, res) {
 				curr = RegExp(RegExp.quote(spl[_i].trim()).replace(';', '\\W'), 'ig');
 				req.query._regex.push(RegExp.quote(spl[_i].trim().replace(';', '')));
 			}
-			s[ope[0]].push({$or : [{question: curr}, {answer: curr}]});
+
+			if(searchSpec){
+				sObj = {};
+				sObj[searchSpec] = curr;
+				s[ope[0]].push(sObj);
+			}else{
+				s[ope[0]].push({$or : [{question: curr}, {answer: curr}]});
+			}
 		}
 
 		questions.find(s, {sort: {askid: -1}}, function(err, rows){
