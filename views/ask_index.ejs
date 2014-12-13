@@ -113,7 +113,7 @@
 									var str = curr[prop]+"";
 									var m   = str.match(reg);
 									if(m === null || m.length < 10)
-	    								curr[prop] = processReplacerQueue(curr[prop+'strip'].replace(reg, genAccentsReplacer(curr, prop)), curr, prop);
+	    								curr[prop+'strip'] = processReplacerQueue(curr[prop+'strip'].replace(reg, genAccentsReplacer(curr, prop)), curr, prop);
 								});
 							});
 
