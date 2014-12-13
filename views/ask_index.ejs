@@ -65,6 +65,14 @@
     <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <script type="text/javascript">
     var prevSearch, lastChange;
+
+    function genAccentsReplacer(curr, prop){
+    	return function(){
+    		var match = arguments[0], p1 = arguments[1], offset = arguments[arguments.length-2], str = arguments[arguments.length-1];
+    		return '<span style="background-color: yellow;">'+curr[prop].substr(offset, p1.length)+'</span>';
+    	};
+    }
+
     $(function(){
     	
     	$('#search_input').on('keyup paste change', function(){
@@ -93,8 +101,8 @@
 	    								var reg = RegExp('('+pattern+')', 'ig');
 	    								var str = curr[prop]+"";
 	    								var m   = str.match(reg);
-	    								if(m && m.length < 10)
-		    								curr[prop] = curr[prop].replace(reg, '<span style="background-color: yellow;">$1</span>');
+	    								if(m === null || m.length < 10)
+		    								curr[prop] = curr[prop+'strip'].replace(reg, genAccentsReplacer(curr, prop));
 	    							});
 	    						});
 
