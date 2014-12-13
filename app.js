@@ -57,10 +57,10 @@ app.get('/search', function (req, res) {
 			}
 
 			try{
-				curr = RegExp(spl[_i].trim().replace(';', '\\W'), 'ig');
+				curr = RegExp(spl[_i].trim().replace(';', '(\\W|$)'), 'ig');
 				req.query._regex.push(spl[_i].trim().replace(';', ''));
 			}catch(err){
-				curr = RegExp(RegExp.quote(spl[_i].trim()).replace(';', '\\W'), 'ig');
+				curr = RegExp(RegExp.quote(spl[_i].trim()).replace(';', '(\\W|$)'), 'ig');
 				req.query._regex.push(RegExp.quote(spl[_i].trim().replace(';', '')));
 			}
 
