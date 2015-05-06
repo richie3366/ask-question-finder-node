@@ -23,6 +23,14 @@ app.all('*', function(req, res, next) {
  });
 
 app.get('/', function (req, res) {
+
+	if(req.query && req.query.s){
+		res.redirect('/#'+(encodeURIComponent(req.query.s)));
+		res.end();
+		return;
+	}
+
+
 	res.render('ask_index');
 });
 
