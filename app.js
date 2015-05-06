@@ -130,6 +130,8 @@ var contentLoaded = function(data){
 
                 console.log(askid, question, answer);
             });
+
+            window.close();
         }
     );
 };
